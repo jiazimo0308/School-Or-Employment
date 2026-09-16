@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>升学就业判断器</title>
+  <style>
+    :root {
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --ink: #1f2937;
+      --muted: #667085;
+      --line: #d9dee8;
+      --primary: #2364aa;
+      --primary-dark: #174a7c;
+      --good: #177245;
+      --warn: #a15c07;
+      --bad: #9f2635;
+      --shadow: 0 14px 38px rgba(31, 41, 55, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", Arial, sans-serif;
+      background:
+        linear-gradient(135deg, rgba(35, 100, 170, 0.11), transparent 35%),
+        linear-gradient(315deg, rgba(23, 114, 69, 0.11), transparent 32%),
+        var(--bg);
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 34px 0 42px;
+    }
+
+    header {
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(28px, 4vw, 44px);
+      letter-spacing: 0;
+      line-height: 1.12;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 820px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.94fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(217, 222, 232, 0.9);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    form {
+      padding: 22px;
+    }
+
+    fieldset {
+      margin: 0 0 22px;
+      padding: 0;
+      border: 0;
+    }
+
+    fieldset:last-of-type {
+      margin-bottom: 0;
+    }
+
+    legend {
+      width: 100%;
+      margin-bottom: 12px;
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    label {
+      display: grid;
+      gap: 7px;
+      color: #344054;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    select {
+      width: 100%;
+      min-height: 42px;
+      padding: 8px 12px;
+      color: var(--ink);
+      border: 1px solid #c8cfdb;
+      border-radius: 7px;
+      background: #fff;
+      font: inherit;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(35, 100, 170, 0.16);
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.45;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      min-height: 42px;
+      padding: 9px 16px;
+      border: 0;
+      border-radius: 7px;
+      color: #fff;
+      background: var(--primary);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    button.secondary {
+      color: var(--ink);
+      border: 1px solid #c8cfdb;
+      background: #fff;
+    }
+
+    button.secondary:hover {
+      background: #f3f5f8;
+    }
+
+    .result {
+      position: sticky;
+      top: 18px;
+      padding: 22px;
+    }
+
+    .result h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 16px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      color: #174a7c;
+      background: #e8f1fb;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .badge.good {
+      color: var(--good);
+      background: #e8f6ef;
+    }
+
+    .badge.warn {
+      color: var(--warn);
+      background: #fff4df;
+    }
+
+    .badge.bad {
+      color: var(--bad);
+      background: #fae9ec;
+    }
+
+    .headline {
+      margin: 0 0 14px;
+      padding: 14px;
+      border-left: 4px solid var(--primary);
+      border-radius: 7px;
+      background: #f3f8ff;
+      font-size: 18px;
+      line-height: 1.55;
+      font-weight: 750;
+    }
+
+    .section-title {
+      margin: 18px 0 8px;
+      color: #344054;
+      font-size: 15px;
+      font-weight: 750;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #344054;
+      line-height: 1.68;
+    }
+
+    li + li {
+      margin-top: 4px;
+    }
+
+    .empty {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    @media (max-width: 860px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .result {
+        position: static;
+      }
+    }
+
+    @media (max-width: 560px) {
+      main {
+        width: min(100% - 22px, 1120px);
+        padding-top: 22px;
+      }
+
+      form,
+      .result {
+        padding: 16px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>升学就业判断器</h1>
+      <p class="lead">选择符合学生情况的选项，系统会按照“绩点、专业课能力、政治身份、干部经历、组织认可度、专业特征、学习方式”等规则输出建议。</p>
+    </header>
+
+    <div class="layout">
+      <section class="panel">
+        <form id="advisorForm">
+          <fieldset>
+            <legend>基础情况</legend>
+            <div class="grid">
+              <label>
+                专业类型
+                <select id="major">
+                  <option value="other">其余专业</option>
+                  <option value="marx">马理论</option>
+                </select>
+              </label>
+
+              <label>
+                绩点水平
+                <select id="gpa">
+                  <option value="high">高绩点</option>
+                  <option value="normal">一般绩点</option>
+                  <option value="low">较低绩点</option>
+                </select>
+              </label>
+
+              <label>
+                专业课技能
+                <select id="skill">
+                  <option value="strong">专业课技能强</option>
+                  <option value="medium">专业课一般</option>
+                  <option value="weak">专业课不行</option>
+                </select>
+              </label>
+
+              <label>
+                学习方式
+                <select id="studyMode">
+                  <option value="sprint">学前/考前冲刺型</option>
+                  <option value="steady">一板一眼学</option>
+                  <option value="mixed">混合型或不确定</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>组织与公共岗位适配</legend>
+            <div class="grid">
+              <label>
+                政治身份
+                <select id="party">
+                  <option value="yes">党员或预备党员</option>
+                  <option value="no">非党员</option>
+                </select>
+              </label>
+
+              <label>
+                干部经历
+                <select id="cadre">
+                  <option value="yes">有学生干部/班团干部经历</option>
+                  <option value="no">暂无干部经历</option>
+                </select>
+              </label>
+
+              <label>
+                学生组织认可度
+                <select id="recognition">
+                  <option value="high">认可度高</option>
+                  <option value="normal">认可度一般</option>
+                  <option value="low">认可度低</option>
+                </select>
+              </label>
+
+              <label>
+                公共事务兴趣
+                <select id="publicInterest">
+                  <option value="high">有兴趣</option>
+                  <option value="normal">一般</option>
+                  <option value="low">不太感兴趣</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>马理论专用判断</legend>
+            <div class="grid">
+              <label>
+                马原绩点
+                <select id="mayuan">
+                  <option value="high">高</option>
+                  <option value="normal">一般</option>
+                  <option value="low">低</option>
+                </select>
+              </label>
+
+              <label>
+                毛概绩点
+                <select id="maogai">
+                  <option value="high">高</option>
+                  <option value="normal">一般</option>
+                  <option value="low">低</option>
+                </select>
+              </label>
+
+              <label>
+                习思绩点
+                <select id="xisi">
+                  <option value="high">高</option>
+                  <option value="normal">一般</option>
+                  <option value="low">低</option>
+                </select>
+              </label>
+
+              <label>
+                论文/项目/竞赛/实践产出
+                <select id="output">
+                  <option value="high">产出高</option>
+                  <option value="normal">产出一般</option>
+                  <option value="low">产出少</option>
+                </select>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>其余专业补充判断</legend>
+            <div class="grid">
+              <label>
+                兴趣程度
+                <select id="interest">
+                  <option value="high">感兴趣</option>
+                  <option value="normal">一般</option>
+                  <option value="low">不感兴趣</option>
+                </select>
+              </label>
+
+              <label>
+                目前掌握程度
+                <select id="mastery">
+                  <option value="high">掌握较好</option>
+                  <option value="normal">掌握一般</option>
+                  <option value="low">掌握较弱</option>
+                </select>
+              </label>
+            </div>
+            <p class="hint">其余专业主要看绩点 + 感兴趣程度，或绩点 + 目前掌握程度。</p>
+          </fieldset>
+
+          <div class="actions">
+            <button type="submit">生成结果</button>
+            <button class="secondary" type="button" id="resetBtn">重置选项</button>
+          </div>
+        </form>
+      </section>
+
+      <aside class="panel result" aria-live="polite">
+        <h2>判断结果</h2>
+        <div class="badge-row" id="badges"></div>
+        <p class="headline" id="headline">请先选择左侧选项，然后点击“生成结果”。</p>
+        <p class="section-title">触发规则</p>
+        <ul id="rules">
+          <li>暂无结果。</li>
+        </ul>
+        <p class="section-title">建议动作</p>
+        <ul id="actions">
+          <li>完成选择后会自动生成。</li>
+        </ul>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("advisorForm");
+    const resetBtn = document.getElementById("resetBtn");
+    const headline = document.getElementById("headline");
+    const rulesList = document.getElementById("rules");
+    const actionsList = document.getElementById("actions");
+    const badges = document.getElementById("badges");
+
+    const textMap = {
+      high: "高",
+      normal: "一般",
+      low: "低",
+      strong: "强",
+      medium: "一般",
+      weak: "不行",
+      yes: "是",
+      no: "否"
+    };
+
+    function value(id) {
+      return document.getElementById(id).value;
+    }
+
+    function scoreLevel(level) {
+      if (level === "high" || level === "strong") return 2;
+      if (level === "normal" || level === "medium") return 1;
+      return 0;
+    }
+
+    function setList(element, items) {
+      element.innerHTML = "";
+      if (items.length === 0) {
+        const li = document.createElement("li");
+        li.textContent = "未触发明显规则。";
+        element.appendChild(li);
+        return;
+      }
+
+      items.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        element.appendChild(li);
+      });
+    }
+
+    function addBadge(text, type = "") {
+      const span = document.createElement("span");
+      span.className = type ? `badge ${type}` : "badge";
+      span.textContent = text;
+      badges.appendChild(span);
+    }
+
+    function judge() {
+      const data = {
+        major: value("major"),
+        gpa: value("gpa"),
+        skill: value("skill"),
+        studyMode: value("studyMode"),
+        party: value("party"),
+        cadre: value("cadre"),
+        recognition: value("recognition"),
+        publicInterest: value("publicInterest"),
+        mayuan: value("mayuan"),
+        maogai: value("maogai"),
+        xisi: value("xisi"),
+        output: value("output"),
+        interest: value("interest"),
+        mastery: value("mastery")
+      };
+
+      const rules = [];
+      const actions = [];
+      const conclusions = [];
+      let graduateScore = 0;
+      let civilScore = 0;
+      let abilityTag = "";
+
+      if (data.gpa === "high" && data.skill === "strong") {
+        graduateScore += 4;
+        conclusions.push("考研匹配度高");
+        rules.push("高绩点 + 专业课技能强 = 适合考研。");
+        actions.push("优先梳理目标院校、考试科目和专业课复习计划。");
+      }
+
+      if (data.gpa === "normal" && data.skill === "weak") {
+        graduateScore -= 3;
+        conclusions.push("考研不是最佳选项");
+        rules.push("一般绩点 + 专业课不行 = 考研不是最佳选项。");
+        actions.push("先补专业基础，也可以同步评估就业、考公、考编等路径。");
+      }
+
+      if (data.party === "yes" && data.cadre === "yes" && data.recognition === "high") {
+        civilScore += 4;
+        conclusions.push("适合考公");
+        rules.push("党员 + 干部 + 学生组织认可度高 = 适合考公。");
+        actions.push("重点关注选调、公务员、事业单位，以及基层服务项目条件。");
+      }
+
+      if (data.publicInterest === "high") {
+        civilScore += 1;
+        rules.push("公共事务兴趣高，会增强考公/公共岗位适配度。");
+      } else if (data.publicInterest === "low") {
+        civilScore -= 1;
+        rules.push("公共事务兴趣较低，考公需要再确认长期动机。");
+      }
+
+      if (data.major === "marx") {
+        const courseScore = scoreLevel(data.mayuan) + scoreLevel(data.maogai) + scoreLevel(data.xisi);
+        const outputScore = scoreLevel(data.output);
+        rules.push(`马理论专业重点看马原、毛概、习思绩点，以及产出；当前课程综合为 ${courseScore}/6，产出为${textMap[data.output]}。`);
+
+        if (courseScore >= 5 && outputScore >= 1) {
+          graduateScore += 3;
+          conclusions.push("马理论方向适合继续深造");
+          actions.push("把马原、毛概、习思的优势整理成复试材料或论文选题方向。");
+        } else if (courseScore >= 3 && outputScore >= 2) {
+          graduateScore += 2;
+          conclusions.push("马理论可通过产出增强竞争力");
+          actions.push("继续积累论文、课题、竞赛、宣讲或实践成果。");
+        } else {
+          graduateScore -= 1;
+          conclusions.push("马理论深造基础需要补强");
+          actions.push("先补核心课程短板，再决定是否冲刺考研。");
+        }
+      } else {
+        const interestScore = scoreLevel(data.interest);
+        const masteryScore = scoreLevel(data.mastery);
+        const gpaScore = scoreLevel(data.gpa);
+        const otherMajorScore = gpaScore + Math.max(interestScore, masteryScore);
+        rules.push(`其余专业重点看绩点 + 感兴趣程度，或绩点 + 掌握程度；当前综合为 ${otherMajorScore}/4。`);
+
+        if (otherMajorScore >= 3) {
+          graduateScore += 2;
+          conclusions.push("本专业路径可继续推进");
+          actions.push("选择兴趣或掌握程度更强的方向做课程、项目和院校匹配。");
+        } else {
+          graduateScore -= 1;
+          conclusions.push("本专业继续深造需谨慎");
+          actions.push("先确认是否真的喜欢本专业，再考虑跨考、就业或考公。");
+        }
+      }
+
+      if (data.studyMode === "sprint" && data.gpa === "high") {
+        abilityTag = "高学习能力";
+        conclusions.push("高学习能力");
+        rules.push("学前/考前冲刺 + 高绩点 = 高学习能力。");
+        actions.push("适合设置阶段性冲刺目标，但要补足长期复盘机制。");
+      }
+
+      if (data.studyMode === "steady" && data.gpa === "high") {
+        abilityTag = "学习习惯好";
+        conclusions.push("学习习惯好");
+        rules.push("一板一眼学 + 高绩点 = 学习习惯好。");
+        actions.push("适合稳定备考路线，可以用周计划和月复盘扩大优势。");
+      }
+
+      if (data.gpa === "low" && data.skill === "weak") {
+        graduateScore -= 2;
+        rules.push("绩点较低且专业课较弱，直接考研风险较高。");
+        actions.push("先做基础补课和实习/实践验证，不建议盲目投入长线备考。");
+      }
+
+      badges.innerHTML = "";
+      if (graduateScore >= 4) {
+        addBadge("考研优先", "good");
+      } else if (graduateScore <= -2) {
+        addBadge("考研谨慎", "bad");
+      } else {
+        addBadge("考研待观察", "warn");
+      }
+
+      if (civilScore >= 4) {
+        addBadge("考公适合", "good");
+      } else if (civilScore >= 1) {
+        addBadge("考公可考虑", "warn");
+      } else {
+        addBadge("考公需确认动机");
+      }
+
+      if (abilityTag) {
+        addBadge(abilityTag, "good");
+      }
+
+      const uniqueConclusions = [...new Set(conclusions)];
+      if (uniqueConclusions.length === 0) {
+        headline.textContent = "当前信息未形成强倾向，建议先补充成绩、专业课能力和兴趣/掌握程度证据。";
+      } else {
+        headline.textContent = `综合建议：${uniqueConclusions.join("；")}。`;
+      }
+
+      setList(rulesList, rules);
+      setList(actionsList, [...new Set(actions)]);
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      judge();
+    });
+
+    resetBtn.addEventListener("click", () => {
+      form.reset();
+      badges.innerHTML = "";
+      headline.textContent = "请先选择左侧选项，然后点击“生成结果”。";
+      setList(rulesList, ["暂无结果。"]);
+      setList(actionsList, ["完成选择后会自动生成。"]);
+    });
+
+    judge();
+  </script>
+</body>
+</html>
